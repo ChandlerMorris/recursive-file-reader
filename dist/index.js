@@ -15,12 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const getFileSync_1 = __importDefault(require("./getFileSync"));
 const getFilesAsync_1 = __importDefault(require("./getFilesAsync"));
 const dir = './features';
+const measurePerformance = (func) => (...args) => {
+    const startTime = performance.now();
+    const result = func(...args);
+    const endTime = performance.now();
+    console.log(`\nFunction ${func.name} took ${(endTime - startTime).toFixed(2)} milliseconds to execute.`);
+    return result;
+};
 // Synchronous version of getFiles
-console.log('Files: ', (0, getFileSync_1.default)(dir));
+const measuredGetFilesSync = measurePerformance(getFileSync_1.default);
+console.log('Files: ', measuredGetFilesSync(dir));
 // Asynchronous version of getFiles
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const files = yield (0, getFilesAsync_1.default)(dir);
+        const measuredGetFilesAsync = measurePerformance(getFilesAsync_1.default);
+        const files = yield measuredGetFilesAsync(dir);
         console.log('Files: ', files);
     }
     catch (err) {
