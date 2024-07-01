@@ -3,25 +3,42 @@ import getFilesAsync from './getFilesAsync';
 
 const dir = './features';
 
-const measurePerformance = <T extends (...args: any[]) => any>(func: (...args: Parameters<T>) => ReturnType<T>) => 
-    (...args: Parameters<T>): ReturnType<T> => {
+const average = (array: number[]) => array.reduce((a, b) => a + b) / array.length;
+
+const measurePerformance = <T extends (...args: any[]) => any>(func: T) => 
+    async (...args: Parameters<T>): Promise<number> => {
         const startTime = performance.now();
-        const result = func(...args);
-        const endTime = performance.now();
-        console.log(`\nFunction ${func.name} took ${(endTime - startTime).toFixed(2)} milliseconds to execute.`);
-        return result;
+        let result: string;
+        try {
+            result = await func(...args);
+            const endTime = performance.now();
+            const totalTime = endTime - startTime;
+            return totalTime;
+        } catch (error) {
+            console.error(`\nFunction ${func.name} encountered an error:`, error);
+            throw error;
+        }
     };
 
-// Synchronous version of getFiles
-const measuredGetFilesSync = measurePerformance(getFilesSync);
-console.log('Files: ', measuredGetFilesSync(dir));
+const performRun = async <T extends (...args: any[]) => any>(func: T, times: number, ...args: Parameters<T>): Promise<string> => {
+    const results: Array<number> = [];
+    for (let i = 0; i < times; i++) {
+        const result = await measurePerformance(func)(...args);
+        results.push(result);
+    }
+    const resultsAverage = average(results);
+    const runResult = `Function: ${func.name} | Number of runs: ${times} | Average runtime per run: ${(resultsAverage).toFixed(2)}`;
 
-// Asynchronous version of getFiles
+    return runResult;
+};
+
 const main = async () => {
     try {
-        const measuredGetFilesAsync = measurePerformance(getFilesAsync);
-        const files = await measuredGetFilesAsync(dir);
-        console.log('Files: ', files);
+        const syncResult = await performRun(getFilesSync, 100, dir);
+        console.log(syncResult);
+
+        const asyncResult = await performRun(getFilesAsync, 100, dir);
+        console.log(asyncResult);
     } catch (err) {
         console.error('Error: ', err);
     };

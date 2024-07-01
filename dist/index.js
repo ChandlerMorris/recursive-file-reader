@@ -15,22 +15,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const getFileSync_1 = __importDefault(require("./getFileSync"));
 const getFilesAsync_1 = __importDefault(require("./getFilesAsync"));
 const dir = './features';
-const measurePerformance = (func) => (...args) => {
+const average = (array) => array.reduce((a, b) => a + b) / array.length;
+const measurePerformance = (func) => (...args) => __awaiter(void 0, void 0, void 0, function* () {
     const startTime = performance.now();
-    const result = func(...args);
-    const endTime = performance.now();
-    console.log(`\nFunction ${func.name} took ${(endTime - startTime).toFixed(2)} milliseconds to execute.`);
-    return result;
-};
-// Synchronous version of getFiles
-const measuredGetFilesSync = measurePerformance(getFileSync_1.default);
-console.log('Files: ', measuredGetFilesSync(dir));
-// Asynchronous version of getFiles
+    let result;
+    try {
+        result = yield func(...args);
+        const endTime = performance.now();
+        const totalTime = endTime - startTime;
+        // console.log(`\nFunction ${func.name} took ${(endTime - startTime).toFixed(2)} milliseconds to execute.`);
+        return totalTime;
+    }
+    catch (error) {
+        console.error(`\nFunction ${func.name} encountered an error:`, error);
+        throw error;
+    }
+});
+const performRun = (func, times, ...args) => __awaiter(void 0, void 0, void 0, function* () {
+    const results = [];
+    for (let i = 0; i < times; i++) {
+        const result = yield measurePerformance(func)(...args);
+        results.push(result);
+    }
+    const resultsAverage = average(results);
+    const runResult = `Function: ${func.name} | Number of runs: ${times} | Average runtime per run: ${(resultsAverage).toFixed(2)}`;
+    return runResult;
+});
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const measuredGetFilesAsync = measurePerformance(getFilesAsync_1.default);
-        const files = yield measuredGetFilesAsync(dir);
-        console.log('Files: ', files);
+        const syncResult = yield performRun(getFileSync_1.default, 100, dir);
+        console.log(syncResult);
+        const asyncResult = yield performRun(getFilesAsync_1.default, 100, dir);
+        console.log(asyncResult);
     }
     catch (err) {
         console.error('Error: ', err);
