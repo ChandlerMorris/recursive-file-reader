@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const getFileSync_1 = __importDefault(require("./getFileSync"));
 const getFilesAsync_1 = __importDefault(require("./getFilesAsync"));
-const dir = './features';
+const dir = './generatedFeatures';
 const average = (array) => array.reduce((a, b) => a + b) / array.length;
 const measurePerformance = (func) => (...args) => __awaiter(void 0, void 0, void 0, function* () {
     const startTime = performance.now();
@@ -23,7 +23,6 @@ const measurePerformance = (func) => (...args) => __awaiter(void 0, void 0, void
         result = yield func(...args);
         const endTime = performance.now();
         const totalTime = endTime - startTime;
-        // console.log(`\nFunction ${func.name} took ${(endTime - startTime).toFixed(2)} milliseconds to execute.`);
         return totalTime;
     }
     catch (error) {
@@ -43,9 +42,9 @@ const performRun = (func, times, ...args) => __awaiter(void 0, void 0, void 0, f
 });
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const syncResult = yield performRun(getFileSync_1.default, 100, dir);
+        const syncResult = yield performRun(getFileSync_1.default, 10, dir);
         console.log(syncResult);
-        const asyncResult = yield performRun(getFilesAsync_1.default, 100, dir);
+        const asyncResult = yield performRun(getFilesAsync_1.default, 10, dir);
         console.log(asyncResult);
     }
     catch (err) {

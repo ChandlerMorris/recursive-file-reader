@@ -1,7 +1,7 @@
 import getFilesSync from './getFileSync';
 import getFilesAsync from './getFilesAsync';
 
-const dir = './features';
+const dir = './generatedFeatures';
 
 const average = (array: number[]) => array.reduce((a, b) => a + b) / array.length;
 
@@ -34,10 +34,10 @@ const performRun = async <T extends (...args: any[]) => any>(func: T, times: num
 
 const main = async () => {
     try {
-        const syncResult = await performRun(getFilesSync, 100, dir);
+        const syncResult = await performRun(getFilesSync, 10, dir);
         console.log(syncResult);
 
-        const asyncResult = await performRun(getFilesAsync, 100, dir);
+        const asyncResult = await performRun(getFilesAsync, 10, dir);
         console.log(asyncResult);
     } catch (err) {
         console.error('Error: ', err);

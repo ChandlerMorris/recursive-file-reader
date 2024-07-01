@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tsc && node dist/index.js"
+    "dev": "npx tsc && node dist/index.js",
+    "generate": "npx tsc && node dist/generateTestFiles.js"
   },
   "keywords": [],
   "author": "",
